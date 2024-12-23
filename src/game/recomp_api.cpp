@@ -14,6 +14,35 @@
 #include "ultramodern/ultramodern.hpp"
 #include "ultramodern/config.hpp"
 
+#include <stdint.h>
+
+#if defined(__SIZEOF_INT128__)
+
+extern "C" void DDIVU(uint64_t a, uint64_t b, uint64_t * lo, uint64_t * hi) {
+    uint64_t quotient = ((unsigned __int128)a) / ((unsigned __int128)b);
+    uint64_t remainder = ((unsigned __int128)a) % ((unsigned __int128)b);
+
+    *lo = quotient;
+    *hi = remainder;
+}
+
+#elif defined(_MSC_VER)
+
+#include <intrin.h>
+#pragma intrinsic(_udiv128)
+
+void DDIVU(uint64_t a, uint64_t b, uint64_t * lo, uint64_t * hi) {
+    *lo = _udiv128(0, a, b, hi);
+}
+
+#else
+#error "128-bit integer type not found"
+#endif
+
+extern "C" void osPfsReFormat(uint8_t* rdram, recomp_context* ctx) {
+    ctx->r2 = 0x01;
+}
+
 extern "C" void recomp_update_inputs(uint8_t* rdram, recomp_context* ctx) {
     recomp::poll_inputs();
 }

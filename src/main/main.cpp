@@ -313,7 +313,8 @@ RspUcodeFunc* get_rsp_microcode(const OSTask* task) {
         return aspMain;
 
     case M_NJPEGTASK:
-        return njpgdspMain;
+        //return njpgdspMain;
+        return nullptr;
 
     default:
         fprintf(stderr, "Unknown task: %" PRIu32 "\n", task->t.type);
@@ -327,10 +328,10 @@ gpr get_entrypoint_address();
 // array of supported GameEntry objects
 std::vector<recomp::GameEntry> supported_games = {
     {
-        .rom_hash = 0xEF18B4A9E2386169ULL,
-        .internal_name = "ZELDA MAJORA'S MASK",
-        .game_id = u8"mm.n64.us.1.0",
-        .mod_game_id = "mm",
+        .rom_hash = 0x68512C37A6FDA951ULL,
+        .internal_name = "Diddy Kong Racing  ",
+        .game_id = u8"dkr",
+        .mod_game_id = "dkr",
         .is_enabled = true,
         .entrypoint_address = get_entrypoint_address(),
         .entrypoint = recomp_entrypoint,

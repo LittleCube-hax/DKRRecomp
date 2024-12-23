@@ -18,7 +18,8 @@
 	url = https://github.com/DLTcollab/sse2neon.git
 [submodule "lib/N64ModernRuntime"]
 	path = lib/N64ModernRuntime
-	url = https://github.com/N64Recomp/N64ModernRuntime.git
+	url = https://github.com/LittleCube-hax/N64ModernRuntime.git
+	branch = dkr-brute-force
 [submodule "Zelda64RecompSyms"]
 	path = Zelda64RecompSyms
 	url = https://github.com/Zelda64Recomp/Zelda64RecompSyms
