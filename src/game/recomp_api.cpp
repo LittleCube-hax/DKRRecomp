@@ -43,6 +43,34 @@ extern "C" void osPfsReFormat(uint8_t* rdram, recomp_context* ctx) {
     ctx->r2 = 0x01;
 }
 
+extern "C" void rmonPrintf_recomp(uint8_t* rdram, recomp_context* ctx) {
+    
+}
+
+extern "C" void osPfsIsPlug_recomp(uint8_t* rdram, recomp_context* ctx) {
+    
+}
+
+extern "C" void __osSpSetStatus_recomp(uint8_t* rdram, recomp_context* ctx) {
+    
+}
+
+extern "C" void __osPfsSelectBank_recomp(uint8_t* rdram, recomp_context* ctx) {
+    
+}
+
+extern "C" void osPfsInit_recomp(uint8_t* rdram, recomp_context* ctx) {
+    
+}
+
+extern "C" void __osContRamWrite_recomp(uint8_t* rdram, recomp_context* ctx) {
+    
+}
+
+extern "C" void __osBlockSum(uint8_t* rdram, recomp_context* ctx) {
+    
+}
+
 extern "C" void recomp_update_inputs(uint8_t* rdram, recomp_context* ctx) {
     recomp::poll_inputs();
 }

@@ -7,8 +7,20 @@ output_func_path = "RecompiledFuncs"
 #relocatable_sections_path = "overlays.us.rev1.txt"
 elf_path = "dkr.elf"
 rom_file_path = "dkr.z64"
+#trace_mode = true
+
+manual_funcs = [
+    { name = "__amMan", section = ".main", vram = 0x80002A98, size = 360 },
+    { name = "__amDmaNew", section = ".main", vram = 0x80003008, size = 56 },
+    { name = "__scSchedule", section = ".main", vram = 0x8007A0D4, size = 504 },
+    { name = "__scMain", section = ".main", vram = 0x800795AC, size = 436 }
+]
 
 [patches]
+function_sizes = [
+    { name = "gzip_inflate_block", size = 260 }
+]
+
 stubs = [
     # Stub out unused functions that directly manipulate RCP status.
     #"RcpUtils_PrintRegisterStatus",
@@ -16,8 +28,7 @@ stubs = [
     # Stub out an unnecessary function that accesses kseg1 addresses.
     #"CIC6105_Init"
     # Stub out debugging function set_breakpoint (?)
-    "set_breakpoint",
-    "rmonPrintf_recomp"
+    "set_breakpoint"
 ]
 
 ignored = [
@@ -34,40 +45,24 @@ renamed = [
 
 # Single-instruction patches
 
-# Write audio dlists to kseg0 (cached, 0x80...) addresses instead of kseg1 (uncached, 0xA0...) ones.
-# This saves the recompiler from needing to handle checking for kseg1 addresses on every memory operation.
-# [[patches.instruction]]
-# func = "AudioHeap_WritebackDCache"
-# vram = 0x8018B510
-# value = 0x3C010000 # lui $at, 0x2000 -> lui $at, 0x0000
+# Disable check_imem_validity
+[[patches.instruction]]
+func = "check_imem_validity"
+vram = 0x8006F4F0
+value = 0x00000000
 
-# These two may not be needed with RCP timeout detection disabled
-# # Pretend the RSP has already halted so that the game doesn't attempt to directly manipulate RSP registers.
-# [[patches.instruction]]
-# func = "Sched_HandleAudioCancel"
-# vram = 0x801763D8
-# value = 0x240F0001 # lw	$t7, 0x0($s1) -> li $t7, 1
+[[patches.instruction]]
+func = "check_imem_validity"
+vram = 0x8006F4F8
+value = 0x00000000
 
-# # Ditto.
-# [[patches.instruction]]
-# func = "Sched_HandleGfxCancel"
-# vram = 0x80176534
-# value = 0x240F0001 # lw	$t7, 0x0($s1) -> li $t7, 1
+# Disable check_dmem_validity
+[[patches.instruction]]
+func = "check_dmem_validity"
+vram = 0x8006EFBC
+value = 0x00000000
 
-# Disable RCP timeout detection (sometimes throws false positives, not needed)
-# [[patches.instruction]]
-# func = "AudioMgr_HandleRetrace"
-# vram = 0x80172DBC
-# value = 0x00000000 # jal osSetTimer -> nop
-
-# Ditto.
-# [[patches.instruction]]
-# func = "Graph_TaskSet00"
-# vram = 0x80174218
-# value = 0x00000000 # jal osSetTimer -> nop
-
-# Prevent the minimap from drawing at a point where it can cause a crash when pausing.
-# [[patches.instruction]]
-# func = "func_80106644"
-# vram = 0x80106684
-# value = 0x29E10003 # slti $at, $t7, 0x4 -> slti $at, $t7, 0x3
+[[patches.instruction]]
+func = "check_dmem_validity"
+vram = 0x8006EFC4
+value = 0x00000000
