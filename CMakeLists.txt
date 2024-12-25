@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.20)
-project(Zelda64Recompiled)
+project(DKR64Recompiled)
 set(CMAKE_C_STANDARD 17)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -135,8 +135,8 @@ add_custom_target(DownloadGameControllerDB
     DEPENDS ${CMAKE_SOURCE_DIR}/gamecontrollerdb.txt)
 
 # Main executable
-add_executable(Zelda64Recompiled)
-add_dependencies(Zelda64Recompiled DownloadGameControllerDB)
+add_executable(DKR64Recompiled)
+add_dependencies(DKR64Recompiled DownloadGameControllerDB)
 
 set (SOURCES
     ${CMAKE_SOURCE_DIR}/src/main/main.cpp
@@ -164,7 +164,7 @@ set (SOURCES
     ${CMAKE_SOURCE_DIR}/lib/RmlUi/Backends/RmlUi_Platform_SDL.cpp
 )
 
-target_include_directories(Zelda64Recompiled PRIVATE
+target_include_directories(DKR64Recompiled PRIVATE
     ${CMAKE_SOURCE_DIR}/include
     ${CMAKE_SOURCE_DIR}/lib/concurrentqueue
     ${CMAKE_SOURCE_DIR}/lib/GamepadMotionHelpers
@@ -184,13 +184,13 @@ target_include_directories(Zelda64Recompiled PRIVATE
 )
 
 if(CMAKE_SIZEOF_VOID_P EQUAL 8 AND CMAKE_SYSTEM_PROCESSOR MATCHES "x86_64|amd64|AMD64")
-    target_compile_options(Zelda64Recompiled PRIVATE
+    target_compile_options(DKR64Recompiled PRIVATE
         -march=nehalem
         -fno-strict-aliasing
         -fms-extensions
     )
 else()
-    target_compile_options(Zelda64Recompiled PRIVATE
+    target_compile_options(DKR64Recompiled PRIVATE
         -fno-strict-aliasing
         -fms-extensions
     )
@@ -198,7 +198,7 @@ endif()
 
 if (MSVC)
     # Disable identical code folding, since this breaks mod function patching as multiple functions can get merged into one.
-    target_link_options(Zelda64Recompiled PRIVATE /OPT:NOICF)
+    target_link_options(DKR64Recompiled PRIVATE /OPT:NOICF)
 endif()
 
 if (WIN32)
@@ -216,31 +216,31 @@ if (WIN32)
         URL https://github.com/libsdl-org/SDL/releases/download/release-${SDL2_VERSION}/SDL2-devel-${SDL2_VERSION}-VC.zip
     )
     FetchContent_MakeAvailable(sdl2)
-    target_include_directories(Zelda64Recompiled PRIVATE
+    target_include_directories(DKR64Recompiled PRIVATE
         ${sdl2_SOURCE_DIR}/include
     )
-    target_link_directories(Zelda64Recompiled PRIVATE
+    target_link_directories(DKR64Recompiled PRIVATE
         ${sdl2_SOURCE_DIR}/lib/x64
     )
 
     # Copy SDL2 and dxc DLLs to output folder as post build step
-    add_custom_command(TARGET Zelda64Recompiled POST_BUILD
+    add_custom_command(TARGET DKR64Recompiled POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy_if_different
             "${sdl2_SOURCE_DIR}/lib/x64/SDL2.dll"
             "${CMAKE_SOURCE_DIR}/lib/rt64/src/contrib/dxc/bin/x64/dxil.dll"
             "${CMAKE_SOURCE_DIR}/lib/rt64/src/contrib/dxc/bin/x64/dxcompiler.dll"
-            $<TARGET_FILE_DIR:Zelda64Recompiled>)
+            $<TARGET_FILE_DIR:DKR64Recompiled>)
 
     set_target_properties(
-        Zelda64Recompiled
+        DKR64Recompiled
         PROPERTIES
             LINK_FLAGS_DEBUG "/SUBSYSTEM:CONSOLE"
-            LINK_FLAGS_RELEASE "/SUBSYSTEM:WINDOWS /ENTRY:mainCRTStartup"
-            LINK_FLAGS_RELWITHDEBINFO "/SUBSYSTEM:WINDOWS /ENTRY:mainCRTStartup"
+            #~ LINK_FLAGS_RELEASE "/SUBSYSTEM:WINDOWS /ENTRY:mainCRTStartup"
+            #~ LINK_FLAGS_RELWITHDEBINFO "/SUBSYSTEM:WINDOWS /ENTRY:mainCRTStartup"
             LINK_FLAGS_MINSIZEREL "/SUBSYSTEM:WINDOWS /ENTRY:mainCRTStartup"
     )
 
-    target_sources(Zelda64Recompiled PRIVATE ${CMAKE_SOURCE_DIR}/icons/app.rc)
+    target_sources(DKR64Recompiled PRIVATE ${CMAKE_SOURCE_DIR}/icons/app.rc)
 endif()
 
 if (CMAKE_SYSTEM_NAME MATCHES "Linux")
@@ -252,20 +252,20 @@ if (CMAKE_SYSTEM_NAME MATCHES "Linux")
         COMMAND file_to_c ${CMAKE_SOURCE_DIR}/icons/512.png icon_bytes ${CMAKE_CURRENT_BINARY_DIR}/icon_bytes.c ${CMAKE_CURRENT_BINARY_DIR}/icon_bytes.h 
         DEPENDS ${CMAKE_SOURCE_DIR}/icons/512.png
     )
-    target_sources(Zelda64Recompiled PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/icon_bytes.c)
+    target_sources(DKR64Recompiled PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/icon_bytes.c)
 
     message(STATUS "SDL2_FOUND = ${SDL2_FOUND}")
     message(STATUS "SDL2_INCLUDE_DIRS = ${SDL2_INCLUDE_DIRS}")
 
-    target_include_directories(Zelda64Recompiled PRIVATE ${SDL2_INCLUDE_DIRS})
+    target_include_directories(DKR64Recompiled PRIVATE ${SDL2_INCLUDE_DIRS})
 
     message(STATUS "X11_FOUND = ${X11_FOUND}")
     message(STATUS "X11_Xrandr_FOUND = ${X11_Xrandr_FOUND}")
     message(STATUS "X11_INCLUDE_DIR = ${X11_INCLUDE_DIR}")
     message(STATUS "X11_LIBRARIES = ${X11_LIBRARIES}")
 
-    target_include_directories(Zelda64Recompiled PRIVATE ${X11_INCLUDE_DIR} ${X11_Xrandr_INCLUDE_PATH})
-    target_link_libraries(Zelda64Recompiled PRIVATE ${X11_LIBRARIES} ${X11_Xrandr_LIB})
+    target_include_directories(DKR64Recompiled PRIVATE ${X11_INCLUDE_DIR} ${X11_Xrandr_INCLUDE_PATH})
+    target_link_libraries(DKR64Recompiled PRIVATE ${X11_LIBRARIES} ${X11_Xrandr_LIB})
 
     find_package(Freetype REQUIRED)
 
@@ -274,16 +274,16 @@ if (CMAKE_SYSTEM_NAME MATCHES "Linux")
     message(STATUS "FREETYPE_LIBRARIES = ${FREETYPE_LIBRARIES}")
 
     include_directories(${FREETYPE_LIBRARIES})
-    target_link_libraries(Zelda64Recompiled PRIVATE ${FREETYPE_LIBRARIES})
+    target_link_libraries(DKR64Recompiled PRIVATE ${FREETYPE_LIBRARIES})
 
     set(CMAKE_THREAD_PREFER_PTHREAD TRUE)
     set(THREADS_PREFER_PTHREAD_FLAG TRUE)
     find_package(Threads REQUIRED)
 
-    target_link_libraries(Zelda64Recompiled PRIVATE "-latomic -static-libstdc++" ${CMAKE_DL_LIBS} Threads::Threads)
+    target_link_libraries(DKR64Recompiled PRIVATE "-latomic -static-libstdc++" ${CMAKE_DL_LIBS} Threads::Threads)
 endif()
 
-target_link_libraries(Zelda64Recompiled PRIVATE
+target_link_libraries(DKR64Recompiled PRIVATE
     #~ PatchesLib
     RecompiledFuncs
     SDL2
@@ -323,10 +323,10 @@ else()
     endif()
 endif()
 
-build_vertex_shader(Zelda64Recompiled "shaders/InterfaceVS.hlsl" "shaders/InterfaceVS.hlsl")
-build_pixel_shader(Zelda64Recompiled "shaders/InterfacePS.hlsl" "shaders/InterfacePS.hlsl")
+build_vertex_shader(DKR64Recompiled "shaders/InterfaceVS.hlsl" "shaders/InterfaceVS.hlsl")
+build_pixel_shader(DKR64Recompiled "shaders/InterfacePS.hlsl" "shaders/InterfacePS.hlsl")
 
-target_sources(Zelda64Recompiled PRIVATE ${SOURCES})
+target_sources(DKR64Recompiled PRIVATE ${SOURCES})
 
-set_property(TARGET Zelda64Recompiled PROPERTY VS_DEBUGGER_WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
+set_property(TARGET DKR64Recompiled PROPERTY VS_DEBUGGER_WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
 
